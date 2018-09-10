@@ -1,0 +1,26 @@
+class CommentSpider(scrapy.Spider):
+    name = "comment"
+    file = r'D:\scrapystudy\jingdongpjt\data\product_url.txt'
+    links = open(file)
+    link = links.readlines()
+    ids = []
+    for i in range(len(link)):
+        pattern = r'(\d+)\.html$'
+        id = re.findall(pattern, link[i])
+        ids.append(id)
+    start_urls = []
+    comment_nums = []
+    for i in range(len(ids)):
+        commentUrl = "https://sclub.jd.com/comment/productPageComments.action?callback=\
+        fetchJSON_comment98vv5144&productId="+str(ids[i])+"&score=0&sortType=5&page=1\
+        &pageSize=10&isShadowSku=0&rid=0&fold=1"
+        commentData = urllib.request.urlopen(commentUrl).read().decode('gbk', 'ignore')
+        patt1 = r'"commentCount":(\d+),'
+        comment_num = re.findall(patt1, commentData)
+        comment_nums.append(comment_num)
+        
+        if int(comment_num[0]) % 10 == 0:
+            comment_page_num = int(int(comment_num[0]) / 10)
+        else:
+            comment_page_num = int(int(comment_num[0]) / 10) + 1
+
